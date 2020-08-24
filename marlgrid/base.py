@@ -11,7 +11,7 @@ import warnings
 from .objects import WorldObj, Wall, Goal, Lava, GridAgent, BonusTile, BulkObj, COLORS
 from .agents import GridAgentInterface
 from .rendering import SimpleImageViewer
-from gym_minigrid.rendering import fill_coords, point_in_rect, downsample, highlight_img
+from gym_minigrid.rendering import fill_coords, point_in_rect, point_in_circle, downsample, highlight_img
 
 TILE_PIXELS = 32
 
@@ -291,7 +291,9 @@ class MultiGrid:
                         img_agent = cls.cache_render_obj(top_agent, tile_size, subdivs)
                     else:
                         img_agent = cls.cache_render_obj(obj.agents[0], tile_size, subdivs)
-                    img = cls.blend_tiles(img, img_agent)
+                    # img = cls.blend_tiles(img, img_agent)
+                    img = cls.blend_tiles(img_agent, img)
+                
 
             # Render the tile border if any of the corners are black.
             if (img[([0,0,-1,-1],[0,-1,0,-1])]==0).all(axis=-1).any():
@@ -368,7 +370,7 @@ class MultiGridEnv(gym.Env):
 
         self.reset()
 
-    def seed(self, seed=1337):
+    def seed(self, seed=1996): #337):
         # Seed the random number generator
         self.np_random, _ = gym.utils.seeding.np_random(seed)
         return [seed]
@@ -606,11 +608,11 @@ class MultiGridEnv(gym.Env):
                         pass
 
                 # Toggle/activate an object
-                elif action == agent.actions.toggle:
-                    if fwd_cell:
-                        wasted = bool(fwd_cell.toggle(agent, fwd_pos))
-                    else:
-                        pass
+                # elif action == agent.actions.toggle:
+                #     if fwd_cell:
+                #         wasted = bool(fwd_cell.toggle(agent, fwd_pos))
+                #     else:
+                #         pass
 
                 # Done action (not used by default)
                 elif action == agent.actions.done:
@@ -715,12 +717,12 @@ class MultiGridEnv(gym.Env):
         self,
         mode="human",
         close=False,
-        highlight=True,
+        highlight=False,
         tile_size=TILE_PIXELS,
         show_agent_views=True,
         max_agents_per_col=3,
         agent_col_width_frac = 0.3,
-        agent_col_padding_px = 2,
+        agent_col_padding_px = 1,
         pad_grey = 100
     ):
         """
@@ -776,10 +778,10 @@ class MultiGridEnv(gym.Env):
             
             cols = []
             for col_views in agent_views:
-                col = np.full(( img.shape[0],target_partial_width+2*agent_col_padding_px,3), pad_grey, dtype=np.uint8)
+                col = np.full(( img.shape[0],target_partial_height+2*agent_col_padding_px,3), pad_grey, dtype=np.uint8)
                 for k, view in enumerate(col_views):
                     offset = f_offset(view) + agent_col_padding_px
-                    offset[0] += k*target_partial_height
+                    offset[0] += k*target_partial_width
                     col[offset[0]:offset[0]+view.shape[0], offset[1]:offset[1]+view.shape[1],:] = view
                 cols.append(col)
 
@@ -791,5 +793,6 @@ class MultiGridEnv(gym.Env):
                 self.window.window.set_caption("Marlgrid")
             else:
                 self.window.imshow(img)
-
+        # if inv_colors: 
+        img = 255 - img 
         return img

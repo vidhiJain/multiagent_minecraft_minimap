@@ -1,22 +1,11 @@
-# MarlGrid
-Gridworld for MARL experiments, based on [MiniGrid](https://github.com/maximecb/gym-minigrid).
+# Multiagent Minecraft Minimap 
 
-[![Three agents navigating a cluttered MarlGrid environment.](https://img.youtube.com/vi/e0xL6KB6RBA/0.jpg)](https://youtube.com/watch?v=e0xL6KB6RBA)
-<video src="https://kam.al/images/extra/cluttered_multigrid_example.mp4" id="spinning-video" controls preload loop style="width:400px; max-width:100%; display:block; margin-left:auto; margin-right:auto; margin-bottom:20px;"></video>
+Rendering Minecraft world as minimap 
 
-## Training multiple independent learners
+Gridworld for MARL experiments, based on [Marlgrid]() which is in turn based on [gym-minigrid](https://github.com/maximecb/gym-minigrid).
 
-### Pre-built environment
 
-MarlGrid comes with a few pre-built environments (see marlgrid/envs):
-- `MarlGrid-3AgentCluttered11x11-v0`
-- `MarlGrid-3AgentCluttered15x15-v0`
-- `MarlGrid-2AgentEmpty9x9-v0`
-- `MarlGrid-3AgentEmpty9x9-v0`
-- `MarlGrid-4AgentEmpty9x9-v0`
-(as of v0.0.2)
-
-### Custom environment
+<!-- ### Custom environment
 
 Create an RL agent (e.g. `TestRLAgent` subclassing `marlgrid.agents.LearningAgent`) that implements:
  - `action_step(self, obs)`,
@@ -62,4 +51,4 @@ for i_episode in range(N_episodes):
             # or if "done" is per-agent:
             episode_over = all(done) # or any(done)
             
-```
+``` -->

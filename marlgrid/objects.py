@@ -3,7 +3,9 @@ from enum import IntEnum
 from gym_minigrid.rendering import (
     fill_coords,
     point_in_rect,
+    point_in_circle,
     point_in_triangle,
+    point_in_line,
     rotate_fn,
 )
 
@@ -13,7 +15,8 @@ COLORS = {
     "orange": np.array([255, 165, 0]),
     "green": np.array([0, 255, 0]),
     "blue": np.array([0, 0, 255]),
-    "cyan": np.array([0, 139, 139]),
+    "tonedorange": np.array([255, 155, 55]),
+    "cyan": np.array([10, 139, 139]),
     "purple": np.array([112, 39, 195]),
     "yellow": np.array([255, 255, 0]),
     "olive": np.array([128, 128, 0]),
@@ -23,7 +26,20 @@ COLORS = {
     "white": np.array([255,255,255]),
     "prestige": np.array([255,255,255]),
     "shadow": np.array([35,25,30]), # nice dark purpley color for cells agents can't see.
+    "darkbrown": np.array([101, 67, 33]),
+    'brown'     : np.array([203, 169, 134]), 
+    'green2'    : np.array([63, 165, 76]),
+    'blue2'     : np.array([51, 153,245]),
+    'yellow2'   : np.array([255, 196, 75]),
+    'grey0'     : np.array([200, 200, 200]),
+    'grey2'     : np.array([180, 180, 150]),
+    'grey3'     : np.array([20, 20, 20]),
+    'indianyellow': np.array([222, 159, 75]),
+    # "inv_darkbrown": np.array([255-101, 255-67, 255-33]),
 }
+INV_COLORS = dict(zip(list(map(lambda x: 'inv_' + x, COLORS.keys())), 255 - np.array(list(COLORS.values()))))
+
+COLORS.update(dict(zip(INV_COLORS.keys(), INV_COLORS.values())))
 
 # Used to map colors to integers
 COLOR_TO_IDX = dict({v: k for k, v in enumerate(COLORS.keys())})
@@ -44,7 +60,7 @@ class RegisteredObjectType(type):
 
 
 class WorldObj(metaclass=RegisteredObjectType):
-    def __init__(self, color="worst", state=0):
+    def __init__(self, color="inv_darkbrown", state=0):
         self.color = color
         self.state = state
         self.contains = None
@@ -114,8 +130,8 @@ class WorldObj(metaclass=RegisteredObjectType):
             subclass = cls.recursive_subclasses()[type]
             return subclass(color, state)
 
-    def render(self, img):
-        raise NotImplementedError
+    # def render(self, img):
+    #     raise NotImplementedError
 
     def str_render(self, dir=0):
         return "??"
@@ -214,6 +230,9 @@ class Goal(WorldObj):
         self.reward = reward
 
     def can_overlap(self):
+        return False #True
+    
+    def can_toggle(self):
         return True
 
     def get_reward(self, agent):
@@ -235,19 +254,19 @@ class Floor(WorldObj):
 
     def render(self, img):
         # Give the floor a pale color
-        c = COLORS[self.color]
-        img.setLineColor(100, 100, 100, 0)
-        img.setColor(*c / 2)
-        # img.drawPolygon([
-        #     (1          , TILE_PIXELS),
-        #     (TILE_PIXELS, TILE_PIXELS),
-        #     (TILE_PIXELS,           1),
-        #     (1          ,           1)
-        # ])
-
+        # c = COLORS[self.color]
+        # img.setLineColor(100, 100, 100, 0)
+        # img.setColor(*c / 2)
+        # # img.drawPolygon([
+        # #     (1          , TILE_PIXELS),
+        # #     (TILE_PIXELS, TILE_PIXELS),
+        # #     (TILE_PIXELS,           1),
+        # #     (1          ,           1)
+        # # ])
+        raise NotImplementedError
 
 class EmptySpace(WorldObj):
-    def can_verlap(self):
+    def can_overlap(self):
         return True
 
     def str_render(self, dir=0):
@@ -262,7 +281,7 @@ class Lava(WorldObj):
         return "VV"
 
     def render(self, img):
-        c = (255, 128, 0)
+        c = COLORS[self.color]
 
         # Background color
         fill_coords(img, point_in_rect(0, 1, 0, 1), c)
@@ -286,6 +305,15 @@ class Wall(BulkObj):
 
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
+# class Wall(WorldObj):
+#     def see_behind(self):
+#         return False
+
+#     def str_render(self, dir=0):
+#         return "WW"
+
+#     def render(self, img):
+#         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
 
 
 class Key(WorldObj):
@@ -374,12 +402,19 @@ class Box(WorldObj):
     def __init__(self, color=0, state=0, contains=None):
         super().__init__(color, state)
         self.contains = contains
+        self.state = state
+
+
+    def can_overlap(self):
+        return False #True
 
     def can_pickup(self):
         return True
 
     def toggle(self):
-        raise NotImplementedError
+        # raise NotImplementedError
+        self.state = 1
+        return True
 
     def str_render(self, dir=0):
         return "BB"

@@ -5,6 +5,7 @@ from .doorkey import DoorKeyEnv
 from .cluttered import ClutteredMultiGrid
 from .goalcycle import ClutteredGoalCycleEnv
 from .viz_test import VisibilityTestEnv
+from .minecraft import MinecraftMultiGrid
 
 from ..agents import GridAgentInterface
 from gym.envs.registration import register as gym_register
@@ -12,6 +13,8 @@ from gym.envs.registration import register as gym_register
 import sys
 import inspect
 import random
+from pathlib import Path
+import numpy as np
 
 this_module = sys.modules[__name__]
 registered_envs = []
@@ -21,14 +24,20 @@ def register_marl_env(
     env_name,
     env_class,
     n_agents,
-    grid_size,
-    view_size,
+    grid_size=None,
+    width=None, 
+    height=None,
+    view_size=7,
     view_tile_size=8,
     view_offset=0,
     agent_color=None,
     env_kwargs={},
 ):
-    colors = ["red", "blue", "purple", "orange", "olive", "pink"]
+    colors = ["blue", "red", "purple", "orange", "olive", "pink"]
+    inv_colors = ["inv_" + x for x in colors]
+
+    # if inv_colors:
+    colors = inv_colors 
     assert n_agents <= len(colors)
 
     class RegEnv(env_class):
@@ -45,6 +54,8 @@ def register_marl_env(
                     for c in colors[:n_agents]
                 ],
                 grid_size=grid_size,
+                width=width,
+                height=height,
                 **env_kwargs,
             )
             return instance
@@ -107,9 +118,17 @@ register_marl_env(
 )
 
 register_marl_env(
+    "MarlGrid-4AgentEmpty9x18-v0", EmptyMultiGrid, n_agents=2, width=9, height=18, view_size=7, view_tile_size=5, view_offset=0,
+)
+
+register_marl_env(
+    "MarlGrid-4AgentEmpty18x9-v0", EmptyMultiGrid, n_agents=2, width=18, height=9, view_size=7, view_tile_size=16,
+)
+
+register_marl_env(
     "Goalcycle-demo-solo-v0", 
     ClutteredGoalCycleEnv, 
-    n_agents=1, 
+    n_agents=4, 
     grid_size=13,
     view_size=7,
     view_tile_size=5,
@@ -118,4 +137,19 @@ register_marl_env(
         'clutter_density':0.1,
         'n_bonus_tiles': 3
     }
+)
+
+# register_marl_env(
+#     "MarlGrid-4AgentMinecraft9x9-v0", MinecraftMultiGrid, n_agents=4, grid_size=9, view_size=7
+# )
+RESOURCES_DIR = (Path(__file__).parent / './resources').resolve()
+
+# numpy_array = np.load(Path(RESOURCES_DIR, 'map_set_0.npy'))
+# numpy_array = np.load(Path(RESOURCES_DIR, 'sparky_map.npy'))[:, 1:49, 1:49]
+# numpy_array = np.load(Path(RESOURCES_DIR, 'sparky_map.npy'))[:, 6:16, 24:34]
+# numpy_array = np.load(Path(RESOURCES_DIR, 'sparky_map.npy'))[:, 6:26, 24:44]
+numpy_array = np.load(Path(RESOURCES_DIR, 'map_set_0.npy'))[:, 4:24, 18:40]
+
+register_marl_env(
+    "MarlGrid-4AgentMinecraftSparky-v0", MinecraftMultiGrid, n_agents=3, width=numpy_array.shape[2]+2, height=numpy_array.shape[1]+2, view_size=7
 )
