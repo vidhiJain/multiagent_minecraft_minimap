@@ -151,5 +151,14 @@ RESOURCES_DIR = (Path(__file__).parent / './resources').resolve()
 numpy_array = np.load(Path(RESOURCES_DIR, 'map_set_0.npy'))[:, 4:24, 18:40]
 
 register_marl_env(
-    "MarlGrid-4AgentMinecraftSparky-v0", MinecraftMultiGrid, n_agents=3, width=numpy_array.shape[2]+2, height=numpy_array.shape[1]+2, view_size=7
+    "MarlGrid-3AgentMinecraftSparky-v0", MinecraftMultiGrid, n_agents=3, width=numpy_array.shape[2]+2, height=numpy_array.shape[1]+2, view_size=7,
+    # env_kwargs={'array': numpy_array}
+)
+
+# numpy_array = np.load(Path(RESOURCES_DIR, 'map_set_0.npy'))[:, 6:16, 20:30]
+numpy_array = np.load(Path(RESOURCES_DIR, 'map_set_1.npy'))[:, 6:16, 23:34]
+
+register_marl_env(
+    "MarlGrid-2AgentMinecraftOneRoom-v0", MinecraftMultiGrid, n_agents=2, width=numpy_array.shape[2]+2, height=numpy_array.shape[1]+2, view_size=7,
+    # env_kwargs={'array': numpy_array}
 )

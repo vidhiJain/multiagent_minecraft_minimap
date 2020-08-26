@@ -228,12 +228,13 @@ class Goal(WorldObj):
     def __init__(self, reward, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.reward = reward
+        self.state = 1
 
     def can_overlap(self):
         return False #True
     
     def can_toggle(self):
-        return True
+        return self.state
 
     def get_reward(self, agent):
         return self.reward
@@ -244,7 +245,12 @@ class Goal(WorldObj):
     def render(self, img):
         fill_coords(img, point_in_rect(0, 1, 0, 1), COLORS[self.color])
 
+    def toggle(self, agent, pos):
+        self.color = 'inv_blue'
+        self.state = 0 # can_toggle is False now
+        return True
 
+        
 class Floor(WorldObj):
     def can_overlap(self):
         return True# and self.agent is None
@@ -406,7 +412,7 @@ class Box(WorldObj):
 
 
     def can_overlap(self):
-        return False #True
+        return True
 
     def can_pickup(self):
         return True

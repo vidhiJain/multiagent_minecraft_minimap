@@ -13,8 +13,8 @@ class GridAgentInterface(GridAgent):
         forward = 2  # Move forward
         pickup = 3  # Pick up an object
         drop = 4  # Drop an object
-        # toggle = 5  # Toggle/activate an object
-        # done = 6  # Done completing task
+        toggle = 5  # Toggle/activate an object
+        done = 6  # Done completing task
 
     def __init__(
             self,

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # env = gym.make('MarlGrid-3AgentCluttered11x11-v0')
 # env = gym.make("MarlGrid-4AgentEmpty18x9-v0")
-env = gym.make("MarlGrid-4AgentMinecraftSparky-v0")
+env = gym.make("MarlGrid-2AgentMinecraftOneRoom-v0")
 obs = env.reset()
 # breakpoint()
 for i in range(100):
